@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/palette"
+        android:scaleType="fitCenter"
+        android:src="@drawable/palette"/>
+
+    <androidx.wear.widget.SwipeDismissFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:id="@+id/swipeBrightness">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/brightnessSelector"
+        android:scaleType="fitXY"
+        android:tintMode="multiply"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/brightness"/>
+
+    </androidx.wear.widget.SwipeDismissFrameLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

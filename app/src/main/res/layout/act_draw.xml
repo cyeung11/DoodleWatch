@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/root"
+    android:background="@color/white"
+    tools:context=".act.DrawActivity"
+    tools:deviceIds="wear">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/canvas">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:id="@+id/oldImage"/>
+
+        <com.jkjk.doodlewatch.MyDrawView
+            android:id="@+id/ink"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </FrameLayout>
+
+    <androidx.wear.widget.BoxInsetLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:visibility="gone"
+        android:id="@+id/vgMenu"
+        android:background="@color/transparent_black"
+        android:padding="@dimen/box_inset_layout_padding">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:boxedEdges="all">
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/btnColor"
+                android:src="@drawable/ic_color"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.45"
+                app:tint="@color/black" />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:id="@+id/btnSave"
+                android:src="@drawable/ic_save"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/btnStroke"
+                android:src="@drawable/ic_stroke"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btnColor"
+                app:layout_constraintBottom_toBottomOf="@id/btnColor"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:id="@+id/btnBackground"
+                android:src="@drawable/ic_background"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btnColor"
+                app:layout_constraintBottom_toBottomOf="@id/btnColor"
+                app:tint="@color/white" />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:id="@+id/btnUndo"
+                android:src="@drawable/ic_undo"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/btnColor"
+                app:layout_constraintTop_toTopOf="@id/btnSave"
+                app:layout_constraintBottom_toBottomOf="@id/btnSave"
+                app:tint="@color/btn_menu_tint" />
+
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:id="@+id/btnRedo"
+                android:src="@drawable/ic_redo"
+                android:background="?selectableItemBackgroundBorderless"
+                app:layout_constraintStart_toEndOf="@id/btnColor"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/btnSave"
+                app:layout_constraintBottom_toBottomOf="@id/btnSave"
+                app:tint="@color/btn_menu_tint" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.wear.widget.BoxInsetLayout>
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:id="@+id/btnMenu"
+        android:src="@drawable/ic_more"
+        android:layout_marginTop="@dimen/margin_small"
+        android:background="?selectableItemBackgroundBorderless"
+        android:layout_gravity="center_horizontal|top"
+        app:tint="@color/black" />
+
+
+</FrameLayout>

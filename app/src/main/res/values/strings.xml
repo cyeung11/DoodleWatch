@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Doodle Watch</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
+
+    <string name="stroke_width">Stroke Width</string>
+
+    <string name="create">New</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit">Edit</string>
+    <string name="exit_instruction">Save the doodle to exit</string>
+
+    <string name="delete_confirm">Do you want to delete this doodle?</string>
+    <string name="doodle_deleted">Deleted</string>
+    <string name="doodle_saved">Saved</string>
+</resources>
