@@ -1,4 +1,4 @@
-package com.jkjk.doodlewatch.model
+package com.jkjk.doodlewatch.core.model
 
 /**
  *Created by chrisyeung on 26/3/2021.
@@ -10,5 +10,12 @@ enum class StrokeSize(val text: String, val size: Float) {
     M("M", 7f),
     L("L", 9f),
     XL("XL", 12.5f),
-    XXL("XXL", 16f)
+    XXL("XXL", 16f);
+
+
+    companion object {
+        fun fromSize(size: Float): StrokeSize? {
+            return values().firstOrNull { it.size == size }
+        }
+    }
 }

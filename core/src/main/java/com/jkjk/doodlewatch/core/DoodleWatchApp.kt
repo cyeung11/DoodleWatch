@@ -1,4 +1,4 @@
-package com.jkjk.doodlewatch
+package com.jkjk.doodlewatch.core
 
 import android.app.Application
 

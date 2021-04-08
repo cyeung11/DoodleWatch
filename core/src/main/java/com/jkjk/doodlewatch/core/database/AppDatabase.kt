@@ -1,10 +1,10 @@
-package com.jkjk.doodlewatch.database
+package com.jkjk.doodlewatch.core.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.jkjk.doodlewatch.model.Drawing
+import com.jkjk.doodlewatch.core.model.Drawing
 
 /**
  *Created by chrisyeung on 26/3/2021.

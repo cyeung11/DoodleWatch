@@ -1,4 +1,4 @@
-package com.jkjk.doodlewatch.model
+package com.jkjk.doodlewatch.core.model
 
 import android.graphics.Color
 import android.os.Parcel

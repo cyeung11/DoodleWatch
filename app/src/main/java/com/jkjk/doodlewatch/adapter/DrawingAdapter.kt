@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import android.util.Base64
 import com.jkjk.doodlewatch.R
-import com.jkjk.doodlewatch.act.BaseAct
-import com.jkjk.doodlewatch.model.Drawing
+import com.jkjk.doodlewatch.core.act.BaseAct
 import kotlinx.android.synthetic.main.item_drawing.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -30,7 +29,7 @@ class DrawingAdapter(private val act: BaseAct,
         SimpleDateFormat("HH:mm", Locale.ENGLISH)
     }
 
-    var dataList: List<Drawing> = listOf()
+    var dataList: List<com.jkjk.doodlewatch.core.model.Drawing> = listOf()
 
     init {
         setHasStableIds(true)
@@ -47,7 +46,7 @@ class DrawingAdapter(private val act: BaseAct,
     }
 
     inner class DrawingViewHolder(itemView: View) : ViewHolder(itemView) {
-        var drawing: Drawing? = null
+        var drawing: com.jkjk.doodlewatch.core.model.Drawing? = null
 
         init {
             itemView.llDelete?.setOnClickListener(this)
@@ -166,8 +165,8 @@ class DrawingAdapter(private val act: BaseAct,
     }
 
     interface OnDrawingSelectListener {
-        fun onDrawingSelect(drawing: Drawing)
-        fun onDrawingDelete(drawing: Drawing)
+        fun onDrawingSelect(drawing: com.jkjk.doodlewatch.core.model.Drawing)
+        fun onDrawingDelete(drawing: com.jkjk.doodlewatch.core.model.Drawing)
         fun onCreateSelect()
     }
 

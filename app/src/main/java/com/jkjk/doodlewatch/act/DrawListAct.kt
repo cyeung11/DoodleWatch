@@ -6,21 +6,21 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import androidx.wear.activity.ConfirmationActivity
+import androidx.wear.widget.ConfirmationOverlay
 import androidx.wear.widget.WearableLinearLayoutManager
 import com.jkjk.doodlewatch.R
 import com.jkjk.doodlewatch.adapter.DrawingAdapter
-import com.jkjk.doodlewatch.database.AppDatabase
-import com.jkjk.doodlewatch.model.Drawing
+import com.jkjk.doodlewatch.core.act.CommunicationAct
+import com.jkjk.doodlewatch.core.database.AppDatabase
+import com.jkjk.doodlewatch.core.model.Drawing
 import kotlinx.android.synthetic.main.act_draw_list.*
-import kotlinx.android.synthetic.main.act_stroke_pick.*
 import kotlinx.android.synthetic.main.act_stroke_pick.recyclerView
 import kotlin.math.max
 
 /**
  *Created by chrisyeung on 26/3/2021.
  */
-class DrawListAct: BaseAct(), DrawingAdapter.OnDrawingSelectListener {
+class DrawListAct: CommunicationAct(), DrawingAdapter.OnDrawingSelectListener {
 
     override val layoutResId: Int
         get() = R.layout.act_draw_list
@@ -76,22 +76,18 @@ class DrawListAct: BaseAct(), DrawingAdapter.OnDrawingSelectListener {
     }
 
     override fun onDrawingDelete(drawing: Drawing) {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, android.R.style.Theme_DeviceDefault_Dialog_Alert)
             .setMessage(R.string.delete_confirm)
             .setPositiveButton(R.string.delete, DialogInterface.OnClickListener { _, _ ->
                 AppDatabase.getInstance(this)
                     .getDrawingDao()
                     .remove(drawing.dbId)
 
-                startActivity(
-                    Intent(this, ConfirmationActivity::class.java).apply {
-                        putExtra(
-                            ConfirmationActivity.EXTRA_ANIMATION_TYPE,
-                            ConfirmationActivity.SUCCESS_ANIMATION
-                        )
-                        putExtra(ConfirmationActivity.EXTRA_MESSAGE, getString(R.string.doodle_deleted))
-                    }
-                )
+                ConfirmationOverlay()
+                    .setType(ConfirmationOverlay.SUCCESS_ANIMATION)
+                    .setMessage(getString(R.string.doodle_deleted))
+                    .showOn(this)
+
             })
             .setNegativeButton(R.string.cancel, null)
             .show()

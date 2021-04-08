@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">DoodleWatch</string>
+
+    <string name="no_app_on_watch">Companion App not found on WearOS</string>
+    <string name="sync">Sync</string>
+    <string name="syncing">Syncing</string>
+    <string name="sync_fail">No connected devices found</string>
+</resources>

@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.wear.widget.SwipeDismissFrameLayout
 import com.jkjk.doodlewatch.R
+import com.jkjk.doodlewatch.core.act.BaseAct
 import kotlinx.android.synthetic.main.act_color_pick.*
 
 class ColorPickAct : BaseAct() {

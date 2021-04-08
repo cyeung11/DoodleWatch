@@ -13,12 +13,12 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import androidx.wear.activity.ConfirmationActivity
-import androidx.wear.ambient.AmbientModeSupport
+import androidx.wear.widget.ConfirmationOverlay
 import com.jkjk.doodlewatch.R
-import com.jkjk.doodlewatch.database.AppDatabase
-import com.jkjk.doodlewatch.model.Drawing
-import com.jkjk.doodlewatch.model.StrokeSize
+import com.jkjk.doodlewatch.core.act.BaseAct
+import com.jkjk.doodlewatch.core.database.AppDatabase
+import com.jkjk.doodlewatch.core.model.Drawing
+import com.jkjk.doodlewatch.core.model.StrokeSize
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.functions.Consumer
@@ -35,6 +35,8 @@ class DrawActivity : BaseAct(), View.OnClickListener {
     private var openingMenu = false
 
     private var backgroundLuminance = 1.0
+
+    private var currentStroke = StrokeSize.M.size
 
     private lateinit var drawing : Drawing
 
@@ -60,7 +62,7 @@ class DrawActivity : BaseAct(), View.OnClickListener {
         btnUndo?.isEnabled = false
         btnRedo?.isEnabled = false
 
-        ink?.setStrokeWidth(StrokeSize.M.size)
+        ink?.setStrokeWidth(currentStroke)
 
         ink.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
@@ -104,10 +106,11 @@ class DrawActivity : BaseAct(), View.OnClickListener {
             REQUEST_CODE_STROKE_SELECT -> {
                 if (resultCode == RESULT_OK) {
                     val selectedSize = data?.getFloatExtra(
-                        StrokePickAct.EXTRA_SELECT_SIZE,
-                        StrokeSize.M.size
+                            StrokePickAct.EXTRA_SELECT_SIZE,
+                            StrokeSize.M.size
                     )
                     if (selectedSize != null) {
+                        currentStroke = selectedSize
                         ink?.setStrokeWidth(selectedSize)
                     }
                 }
@@ -127,20 +130,20 @@ class DrawActivity : BaseAct(), View.OnClickListener {
         backgroundLuminance = ColorUtils.calculateLuminance(color)
 
         vgMenu?.setBackgroundColor(
-            ContextCompat.getColor(
-                this,
-                if (backgroundLuminance < 0.3) {
-                    R.color.transparent_white
-                } else {
-                    R.color.transparent_black
-                }
-            )
+                ContextCompat.getColor(
+                        this,
+                        if (backgroundLuminance < 0.3) {
+                            R.color.transparent_white
+                        } else {
+                            R.color.transparent_black
+                        }
+                )
         )
         btnMenu?.imageTintList = ColorStateList.valueOf(
-            ContextCompat.getColor(
-                this,
-                if (backgroundLuminance < 0.3) R.color.white else R.color.black
-            )
+                ContextCompat.getColor(
+                        this,
+                        if (backgroundLuminance < 0.3) R.color.white else R.color.black
+                )
         )
     }
 
@@ -165,22 +168,23 @@ class DrawActivity : BaseAct(), View.OnClickListener {
             }
             R.id.btnColor -> {
                 startActivityForResult(
-                    Intent(this, ColorPickAct::class.java),
-                    REQUEST_CODE_STROKE_COLOR_SELECT
+                        Intent(this, ColorPickAct::class.java),
+                        REQUEST_CODE_STROKE_COLOR_SELECT
                 )
                 closeMenu()
             }
             R.id.btnBackground -> {
                 startActivityForResult(
-                    Intent(this, ColorPickAct::class.java),
-                    REQUEST_CODE_BACKGROUND_COLOR_SELECT
+                        Intent(this, ColorPickAct::class.java),
+                        REQUEST_CODE_BACKGROUND_COLOR_SELECT
                 )
                 closeMenu()
             }
             R.id.btnStroke -> {
                 startActivityForResult(
-                    Intent(this, StrokePickAct::class.java),
-                    REQUEST_CODE_STROKE_SELECT
+                        Intent(this, StrokePickAct::class.java)
+                                .putExtra(StrokePickAct.EXTRA_CURRENT_SELECT_SIZE, currentStroke),
+                        REQUEST_CODE_STROKE_SELECT
                 )
                 closeMenu()
             }
@@ -200,35 +204,33 @@ class DrawActivity : BaseAct(), View.OnClickListener {
                 drawingBitmap.compress(Bitmap.CompressFormat.PNG, 100, bos)
                 return@fromCallable Base64.encodeToString(bos.toByteArray(), Base64.DEFAULT)
             } catch (e: Exception) {
+                e.printStackTrace()
                 return@fromCallable null
             }
         }
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                Consumer {
-                    if (it != null) {
-                        drawing.base64Image = it
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        Consumer {
+                            if (it != null) {
+                                drawing.base64Image = it
 
-                        AppDatabase.getInstance(this)
-                            .getDrawingDao()
-                            .insert(
-                                drawing
-                            )
+                                AppDatabase.getInstance(this)
+                                        .getDrawingDao()
+                                        .insert(
+                                                drawing
+                                        )
 
-                        startActivity(
-                            Intent(this, ConfirmationActivity::class.java).apply {
-                                putExtra(
-                                    ConfirmationActivity.EXTRA_ANIMATION_TYPE,
-                                    ConfirmationActivity.SUCCESS_ANIMATION
-                                )
-                                putExtra(ConfirmationActivity.EXTRA_MESSAGE, getString(R.string.doodle_saved))
+                                ConfirmationOverlay()
+                                        .setType(ConfirmationOverlay.SUCCESS_ANIMATION)
+                                        .setMessage(getString(R.string.doodle_saved))
+                                        .setOnAnimationFinishedListener {
+                                            finish()
+                                        }
+                                        .showOn(this)
                             }
-                        )
-                        finish()
-                    }
-                }
-            )
+                        }
+                )
 
     }
 
@@ -246,10 +248,10 @@ class DrawActivity : BaseAct(), View.OnClickListener {
         vgMenu?.visibility = View.GONE
         btnMenu?.setImageResource(R.drawable.ic_more)
         btnMenu?.imageTintList = ColorStateList.valueOf(
-            ContextCompat.getColor(
-                this,
-                if (backgroundLuminance < 0.3) R.color.white else R.color.black
-            )
+                ContextCompat.getColor(
+                        this,
+                        if (backgroundLuminance < 0.3) R.color.white else R.color.black
+                )
         )
         openingMenu = false
     }
