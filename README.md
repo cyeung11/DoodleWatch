@@ -6,4 +6,4 @@ A simple WearOS app that let you show your creativity with doodles and sync your
 
 ![image](https://github.com/cyeung11/DoodleWatch/blob/master/watch_screenshot2.png)
 
-![image](https://github.com/cyeung11/DoodleWatch/blob/master/phone_screenshot.jpg)
+<img src="https://github.com/cyeung11/DoodleWatch/blob/master/phone_screenshot.jpg" width="400" height="867">
