@@ -38,7 +38,7 @@ abstract class CommunicationAct : BaseAct(), DataClient.OnDataChangedListener,
         dataClient.addListener(this)
         messageClient.addListener(this)
 
-        sendDrawingSyncTime(this, null)
+        sendDrawingSyncInfo(this, null)
     }
 
     override fun onPause() {
@@ -141,7 +141,7 @@ abstract class CommunicationAct : BaseAct(), DataClient.OnDataChangedListener,
         return request.asPutDataRequest()
     }
 
-    protected fun sendDrawingSyncTime(context: Context, listener: StringListener?) {
+    protected fun sendDrawingSyncInfo(context: Context, listener: StringListener?) {
         Observable.fromCallable {
             val c = Tasks.await(
                 Wearable.getCapabilityClient(context).getCapability(DOODLE_WATCH_CAPABILITY, CapabilityClient.FILTER_REACHABLE)

@@ -2,12 +2,12 @@ package com.jkjk.doodlewatch.adapter
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.util.Base64
 import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
-import android.util.Base64
+import com.jkjk.doodlewatch.HomeAct
 import com.jkjk.doodlewatch.R
-import com.jkjk.doodlewatch.core.act.BaseAct
 import com.jkjk.doodlewatch.core.model.Drawing
 import kotlinx.android.synthetic.main.item_draw_preview.view.*
 import java.text.SimpleDateFormat
@@ -16,7 +16,7 @@ import java.util.*
 /**
  *Created by chrisyeung on 7/4/2021.
  */
-class DrawPreviewAdapter(private val act: BaseAct): GridRecyclerViewAdapter<DrawPreviewAdapter.ViewHolder>(act) {
+class DrawPreviewAdapter(private val act: HomeAct): GridRecyclerViewAdapter<DrawPreviewAdapter.ViewHolder>(act) {
 
     private val dateTimeFormatter by lazy {
         SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH)
@@ -24,19 +24,19 @@ class DrawPreviewAdapter(private val act: BaseAct): GridRecyclerViewAdapter<Draw
 
     var drawingList: List<Drawing> = listOf()
 
-    inner class ViewHolder(itemView: View): GridRecyclerViewAdapter.ViewHolder(itemView) {
+    inner class ViewHolder(itemView: View): GridRecyclerViewAdapter.ViewHolder(itemView), View.OnClickListener {
 
         var drawing: Drawing? = null
 
-//        init {
-//            itemView.setOnClickListener(this)
-//        }
-//
-//        override fun onClick(v: View?) {
-//            if (drawing != null) {
-//
-//            }
-//        }
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View?) {
+            if (drawing != null) {
+                act.onDrawingSelect(drawing!!)
+            }
+        }
     }
 
     override fun getLayoutId(viewType: Int): Int {
