@@ -1,6 +1,5 @@
 package com.jkjk.doodlewatch.core
 
-import com.jkjk.doodlewatch.core.act.BaseAct
 import com.jkjk.doodlewatch.core.act.CommunicationAct
 import dagger.Component
 

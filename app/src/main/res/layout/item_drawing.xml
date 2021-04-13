@@ -15,8 +15,8 @@
         android:layout_height="45dp"
         android:id="@+id/flImage"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/llDateTime"
-        app:layout_constraintBottom_toBottomOf="@id/llDateTime">
+        app:layout_constraintTop_toTopOf="@id/txtDate"
+        app:layout_constraintBottom_toBottomOf="@id/txtTime">
 
         <ImageView
             android:layout_width="match_parent"
@@ -32,35 +32,40 @@
     </FrameLayout>
 
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/llDateTime"
+        android:id="@+id/txtDate"
+        tools:text="29/3/2021"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_large"
         app:layout_constraintStart_toEndOf="@id/flImage"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="@dimen/margin_small"
-        android:orientation="vertical">
+        android:layout_marginStart="@dimen/margin_small"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtDate"
-            tools:text="29/3/2021"
-            android:maxLines="3"
-            android:ellipsize="end"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_large"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/txtTime"
-            tools:text="16:00"
-            android:textColor="@color/grey"
-            android:layout_marginTop="@dimen/margin_x_small"
-            android:textSize="@dimen/text_small"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtTime"
+        tools:text="16:00"
+        android:textColor="@color/grey"
+        android:layout_marginTop="@dimen/margin_x_small"
+        android:textSize="@dimen/text_small"
+        app:layout_constraintStart_toEndOf="@id/flImage"
+        app:layout_constraintTop_toBottomOf="@id/txtDate"
+        android:layout_marginStart="@dimen/margin_small"/>
 
-    </LinearLayout>
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_edit"
+        android:padding="2.5dp"
+        android:id="@+id/imgRename"
+        app:layout_constraintBottom_toBottomOf="@id/txtDate"
+        app:layout_constraintStart_toEndOf="@id/txtDate"
+        app:tint="@color/white" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -71,7 +76,7 @@
         android:visibility="gone"
         android:layout_marginTop="@dimen/margin_small"
         android:background="?selectableItemBackground"
-        app:layout_constraintTop_toBottomOf="@id/llDateTime"
+        app:layout_constraintTop_toBottomOf="@id/txtTime"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/llDelete"
         android:orientation="horizontal">
@@ -80,7 +85,7 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:src="@drawable/ic_edit"
-            android:tint="@color/white"/>
+            app:tint="@color/white"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -112,7 +117,7 @@
         android:visibility="gone"
         android:background="?selectableItemBackground"
         android:layout_marginTop="@dimen/margin_small"
-        app:layout_constraintTop_toBottomOf="@id/llDateTime"
+        app:layout_constraintTop_toBottomOf="@id/txtTime"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/llEdit"
         android:orientation="horizontal">
@@ -121,7 +126,7 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             android:src="@drawable/ic_delete"
-            android:tint="@color/white"/>
+            app:tint="@color/white"/>
 
         <TextView
             android:layout_width="wrap_content"

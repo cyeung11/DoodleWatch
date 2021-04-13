@@ -7,8 +7,11 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.*
 import com.jkjk.doodlewatch.core.CommunicationModule
 import com.jkjk.doodlewatch.core.DaggerCommunicationComponent
+import com.jkjk.doodlewatch.core.database.AppDatabase
 import com.jkjk.doodlewatch.core.database.DrawingDao
+import com.jkjk.doodlewatch.core.database.DrawingHistoryDao
 import com.jkjk.doodlewatch.core.model.Drawing
+import com.jkjk.doodlewatch.core.model.DrawingHistory
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -27,6 +30,7 @@ abstract class CommunicationAct : BaseAct(), DataClient.OnDataChangedListener,
     @Inject lateinit var messageClient: MessageClient
 
     @Inject lateinit var drawingDao: DrawingDao
+    @Inject lateinit var drawingHistoryDao: DrawingHistoryDao
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +67,11 @@ abstract class CommunicationAct : BaseAct(), DataClient.OnDataChangedListener,
                         .subscribe {
                             if (it != null) {
                                 drawingDao.insert(it)
+                                AppDatabase.getInstance(this)
+                                    .getDrawingHistoryDao()
+                                    .insert(
+                                        DrawingHistory(it.dbId, it.lastEditOn)
+                                    )
                             }
                         }
                 }
@@ -93,33 +102,46 @@ abstract class CommunicationAct : BaseAct(), DataClient.OnDataChangedListener,
 
         if (rawString != null) {
 
-            val ids = arrayListOf<Int>()
+            val existingIds = arrayListOf<Int>()
 
             val splitString = rawString.split(";")
             splitString.forEach { info ->
                 val splitInfo = info.split(":")
-                if (splitInfo.size == 2) {
+                if (splitInfo.size == 3) {
                     val dbId = splitInfo[0].toIntOrNull()
                     val lastEdit = splitInfo[1].toLongOrNull()
+                    val deletedOn = splitInfo[2].toLongOrNull()
 
-                    if (dbId != null) {
-                        ids.add(dbId)
-                        if (lastEdit != null) {
-                            drawingDao.getNewer(dbId, lastEdit)?.let {
-                                drawingToSend.add(it)
+                    if (dbId != null && lastEdit != null && deletedOn != null) {
+                        val externalHistory = DrawingHistory(dbId, lastEdit, deletedOn)
+
+                        if (deletedOn > 0) {
+                            drawingDao.remove(dbId)
+                            drawingHistoryDao.insert(externalHistory)
+                        } else {
+                            val localHistory = drawingHistoryDao.getSync(dbId)
+                            if (localHistory != null) {
+                                // local drawing is more updated than external drawing
+                                if (localHistory.lastEditOn > externalHistory.lastEditOn) {
+                                    val localDrawing = drawingDao.getSync(dbId)
+                                    if (localDrawing != null) {
+                                        drawingToSend.add(localDrawing)
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
 
-            drawingToSend.addAll(drawingDao.getNotExist(ids.toIntArray()))
+            // external does not have that drawing at all
+            drawingToSend.addAll(drawingDao.getNotExist(existingIds.toIntArray()))
         }
 
         return drawingToSend
     }
 
-    private fun createDrawingSendRequest(drawing: Drawing): PutDataRequest {
+    protected fun createDrawingSendRequest(drawing: Drawing): PutDataRequest {
         val request = PutDataMapRequest.create("${DOODLE_URI}/${drawing.dbId}").also {
             it.dataMap.apply {
                 putString(MAP_DRAWING_NAME, drawing.name)
@@ -158,10 +180,10 @@ abstract class CommunicationAct : BaseAct(), DataClient.OnDataChangedListener,
 
                 if (nodeId.isNotBlank()) {
 
-                    val all = drawingDao.getAllSync()
+                    val all = drawingHistoryDao.getAllSync()
                     val stringBuilder = StringBuilder()
                     all.forEach {
-                        stringBuilder.append("${it.dbId}:${it.lastEditOn};")
+                        stringBuilder.append("${it.dbId}:${it.lastEditOn}:${it.deletedOn};")
                     }
 
                     Wearable.getMessageClient(context).sendMessage(

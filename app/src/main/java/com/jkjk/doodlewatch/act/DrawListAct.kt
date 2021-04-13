@@ -13,6 +13,7 @@ import com.jkjk.doodlewatch.adapter.DrawingAdapter
 import com.jkjk.doodlewatch.core.act.CommunicationAct
 import com.jkjk.doodlewatch.core.database.AppDatabase
 import com.jkjk.doodlewatch.core.model.Drawing
+import com.jkjk.doodlewatch.core.model.DrawingHistory
 import kotlinx.android.synthetic.main.act_draw_list.*
 import kotlinx.android.synthetic.main.act_stroke_pick.recyclerView
 import kotlin.math.max
@@ -24,6 +25,8 @@ class DrawListAct: CommunicationAct(), DrawingAdapter.OnDrawingSelectListener {
 
     override val layoutResId: Int
         get() = R.layout.act_draw_list
+
+    private var drawingToRename: Drawing? = null
 
     private val adapter: DrawingAdapter by lazy {
         DrawingAdapter(this, this)
@@ -62,6 +65,42 @@ class DrawListAct: CommunicationAct(), DrawingAdapter.OnDrawingSelectListener {
             }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            REQUEST_CODE_NEW_DRAWING -> {
+                if (resultCode == RESULT_OK) {
+                    val newId = data?.getIntExtra(EXTRA_NEW_DRAWING_ID, -1) ?: -1
+                    if (newId != -1) {
+                        drawingDao.getSync(newId)?.let {
+                            // Sync to other devices
+                            dataClient.putDataItem(
+                                    createDrawingSendRequest(it)
+                            )
+                        }
+                    }
+                }
+            }
+            REQUEST_CODE_RENAME -> {
+                if (drawingToRename != null) {
+                    if (resultCode == RESULT_OK) {
+                        val newName = data?.getStringExtra(InputAct.EXTRA_INPUT)
+                        if (newName?.isNotBlank() == true) {
+                            drawingToRename?.name = newName
+                            drawingToRename?.lastEditOn = System.currentTimeMillis()
+                            drawingDao.insert(drawingToRename!!)
+                            // Sync to other devices
+                            dataClient.putDataItem(
+                                    createDrawingSendRequest(drawingToRename!!)
+                            )
+                        }
+                    }
+                    drawingToRename = null
+                }
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+    }
+    
     override fun onDrawingSelect(drawing: Drawing) {
         startActivity(
             Intent(this, DrawActivity::class.java)
@@ -70,8 +109,9 @@ class DrawListAct: CommunicationAct(), DrawingAdapter.OnDrawingSelectListener {
     }
 
     override fun onCreateSelect() {
-        startActivity(
-            Intent(this, DrawActivity::class.java)
+        startActivityForResult(
+            Intent(this, DrawActivity::class.java),
+            REQUEST_CODE_NEW_DRAWING
         )
     }
 
@@ -82,6 +122,10 @@ class DrawListAct: CommunicationAct(), DrawingAdapter.OnDrawingSelectListener {
                 AppDatabase.getInstance(this)
                     .getDrawingDao()
                     .remove(drawing.dbId)
+                AppDatabase.getInstance(this)
+                    .getDrawingHistoryDao()
+                    .insert(DrawingHistory(drawing.dbId, deletedOn = System.currentTimeMillis()))
+                sendDrawingSyncInfo(this, null)
 
                 ConfirmationOverlay()
                     .setType(ConfirmationOverlay.SUCCESS_ANIMATION)
@@ -91,5 +135,21 @@ class DrawListAct: CommunicationAct(), DrawingAdapter.OnDrawingSelectListener {
             })
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    override fun onDrawingRename(drawing: Drawing) {
+        drawingToRename = drawing
+        startActivityForResult(
+                Intent(this, InputAct::class.java)
+                        .putExtra(InputAct.EXTRA_INPUT, drawing.name),
+                REQUEST_CODE_RENAME
+        )
+    }
+
+    companion object {
+        private const val REQUEST_CODE_NEW_DRAWING = 546
+        private const val REQUEST_CODE_RENAME = 547
+
+        const val EXTRA_NEW_DRAWING_ID = "EXTRA_NEW_DRAWING_ID"
     }
 }

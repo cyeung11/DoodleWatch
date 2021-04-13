@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import android.util.Base64
 import com.jkjk.doodlewatch.R
 import com.jkjk.doodlewatch.core.act.BaseAct
+import com.jkjk.doodlewatch.core.model.Drawing
 import kotlinx.android.synthetic.main.item_drawing.view.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -21,15 +22,11 @@ class DrawingAdapter(private val act: BaseAct,
 
     private var expandedDrawingId : Int? = null
 
-    private val dateFormatter by lazy {
-        SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH)
-    }
-
     private val timeFormatter by lazy {
-        SimpleDateFormat("HH:mm", Locale.ENGLISH)
+        SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.ENGLISH)
     }
 
-    var dataList: List<com.jkjk.doodlewatch.core.model.Drawing> = listOf()
+    var dataList: List<Drawing> = listOf()
 
     init {
         setHasStableIds(true)
@@ -46,11 +43,12 @@ class DrawingAdapter(private val act: BaseAct,
     }
 
     inner class DrawingViewHolder(itemView: View) : ViewHolder(itemView) {
-        var drawing: com.jkjk.doodlewatch.core.model.Drawing? = null
+        var drawing: Drawing? = null
 
         init {
             itemView.llDelete?.setOnClickListener(this)
             itemView.llEdit?.setOnClickListener(this)
+            itemView.imgRename?.setOnClickListener(this)
         }
 
         override fun onClick(v: View?) {
@@ -61,6 +59,9 @@ class DrawingAdapter(private val act: BaseAct,
                     }
                     R.id.llEdit -> {
                         listener.onDrawingSelect(drawing!!)
+                    }
+                    R.id.imgRename -> {
+                        listener.onDrawingRename(drawing!!)
                     }
                     else -> {
                         if (expandedDrawingId == drawing?.dbId) {
@@ -130,10 +131,12 @@ class DrawingAdapter(private val act: BaseAct,
                 holder.itemView.llDelete?.visibility = View.VISIBLE
                 holder.itemView.llEdit?.visibility = View.VISIBLE
                 holder.itemView.divider?.visibility = View.VISIBLE
+                holder.itemView.imgRename?.visibility = View.VISIBLE
             } else {
                 holder.itemView.llDelete?.visibility = View.GONE
                 holder.itemView.llEdit?.visibility = View.GONE
                 holder.itemView.divider?.visibility = View.GONE
+                holder.itemView.imgRename?.visibility = View.GONE
             }
 
             holder.itemView.txtTime?.text = try {
@@ -142,12 +145,7 @@ class DrawingAdapter(private val act: BaseAct,
                 e.printStackTrace()
                 ""
             }
-            holder.itemView.txtDate?.text = try {
-                dateFormatter.format(Date(holder.drawing?.lastEditOn ?: 0L))
-            } catch (e: Exception) {
-                e.printStackTrace()
-                ""
-            }
+            holder.itemView.txtDate?.setText(holder.drawing?.name)
 
             if (holder.drawing?.base64Image?.isNotBlank() == true) {
                 Glide.with(act)
@@ -165,8 +163,9 @@ class DrawingAdapter(private val act: BaseAct,
     }
 
     interface OnDrawingSelectListener {
-        fun onDrawingSelect(drawing: com.jkjk.doodlewatch.core.model.Drawing)
-        fun onDrawingDelete(drawing: com.jkjk.doodlewatch.core.model.Drawing)
+        fun onDrawingSelect(drawing: Drawing)
+        fun onDrawingDelete(drawing: Drawing)
+        fun onDrawingRename(drawing: Drawing)
         fun onCreateSelect()
     }
 

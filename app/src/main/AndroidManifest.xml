@@ -38,6 +38,7 @@
             android:theme="@style/UnswipableAppTheme"/>
         <activity android:name=".act.ColorPickAct"/>
         <activity android:name=".act.StrokePickAct"/>
+        <activity android:name=".act.InputAct"/>
         <activity
             android:name="androidx.wear.activity.ConfirmationActivity">
         </activity>

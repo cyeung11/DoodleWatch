@@ -26,6 +26,7 @@ import com.jkjk.doodlewatch.adapter.DrawPreviewAdapter
 import com.jkjk.doodlewatch.core.act.CommunicationAct
 import com.jkjk.doodlewatch.core.database.AppDatabase
 import com.jkjk.doodlewatch.core.model.Drawing
+import com.jkjk.doodlewatch.core.model.DrawingHistory
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -106,12 +107,23 @@ class HomeAct : CommunicationAct(), PermissionManager.PermissionListener {
                         AlertDialog.Builder(this)
                             .setTitle(R.string.rename)
                             .setView(input)
-                            .setPositiveButton(R.string.delete) { _, _ ->
+                            .setPositiveButton(R.string.rename) { _, _ ->
                                 if (input.text.isNullOrBlank()) {
                                     Toast.makeText(this, R.string.name_invalid, Toast.LENGTH_SHORT).show()
                                 } else {
                                     drawing.name = input.text?.toString()
-                                    drawingDao.insert(drawing)
+                                    drawing.lastEditOn = System.currentTimeMillis()
+                                    drawingDao.insert(drawing).toInt()
+                                    AppDatabase.getInstance(this)
+                                        .getDrawingHistoryDao()
+                                        .insert(
+                                            DrawingHistory(drawing.dbId, drawing.lastEditOn)
+                                        )
+
+                                    // Sync to other devices
+                                    dataClient.putDataItem(
+                                            createDrawingSendRequest(drawing)
+                                    )
                                 }
                             }
                             .setNegativeButton(R.string.cancel, null)
@@ -151,6 +163,11 @@ class HomeAct : CommunicationAct(), PermissionManager.PermissionListener {
                             .setMessage(R.string.delete_confirm)
                             .setPositiveButton(R.string.delete) { _, _ ->
                                 drawingDao.remove(drawing.dbId)
+                                AppDatabase.getInstance(this)
+                                    .getDrawingHistoryDao()
+                                    .insert(DrawingHistory(drawing.dbId, drawing.lastEditOn, System.currentTimeMillis()))
+
+                                sendDrawingSyncInfo(this, null)
                             }
                             .setNegativeButton(R.string.cancel, null)
                             .show()

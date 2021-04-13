@@ -24,6 +24,9 @@ interface DrawingDao {
 //    @Query("SELECT * FROM Drawing WHERE lastEditOn > :lastEditOn")
 //    fun getLaterThan(lastEditOn: Long): List<Drawing>
 
+    @Query("SELECT * FROM Drawing WHERE dbId = :id")
+    fun getSync(id: Int): Drawing?
+
     @Query("SELECT * FROM Drawing WHERE dbId = :dbId AND lastEditOn > :lastEditOn")
     fun getNewer(dbId: Int, lastEditOn: Long): Drawing?
 
@@ -31,7 +34,7 @@ interface DrawingDao {
     fun getNotExist(ids: IntArray): List<Drawing>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(drawing: Drawing)
+    fun insert(drawing: Drawing): Long
 
     @Query("DELETE FROM Drawing WHERE dbId = :id")
     fun remove(id: Int)

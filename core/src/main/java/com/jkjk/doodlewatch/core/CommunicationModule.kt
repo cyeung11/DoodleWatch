@@ -6,6 +6,7 @@ import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.Wearable
 import com.jkjk.doodlewatch.core.database.AppDatabase
 import com.jkjk.doodlewatch.core.database.DrawingDao
+import com.jkjk.doodlewatch.core.database.DrawingHistoryDao
 import dagger.Module
 import dagger.Provides
 
@@ -28,5 +29,10 @@ class CommunicationModule(private val context: Context) {
     @Provides
     fun provideDrawingDao(): DrawingDao {
         return AppDatabase.getInstance(context).getDrawingDao()
+    }
+
+    @Provides
+    fun provideDrawingHistoryDao(): DrawingHistoryDao {
+        return AppDatabase.getInstance(context).getDrawingHistoryDao()
     }
 }

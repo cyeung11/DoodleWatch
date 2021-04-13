@@ -18,6 +18,7 @@ import com.jkjk.doodlewatch.R
 import com.jkjk.doodlewatch.core.act.BaseAct
 import com.jkjk.doodlewatch.core.database.AppDatabase
 import com.jkjk.doodlewatch.core.model.Drawing
+import com.jkjk.doodlewatch.core.model.DrawingHistory
 import com.jkjk.doodlewatch.core.model.StrokeSize
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -215,11 +216,18 @@ class DrawActivity : BaseAct(), View.OnClickListener {
                             if (it != null) {
                                 drawing.base64Image = it
 
-                                AppDatabase.getInstance(this)
+                                val id = AppDatabase.getInstance(this)
                                         .getDrawingDao()
                                         .insert(
                                                 drawing
-                                        )
+                                        ).toInt()
+                                AppDatabase.getInstance(this)
+                                    .getDrawingHistoryDao()
+                                    .insert(
+                                        DrawingHistory(id, drawing.lastEditOn)
+                                    )
+
+                                setResult(RESULT_OK, Intent().putExtra(DrawListAct.EXTRA_NEW_DRAWING_ID, id))
 
                                 ConfirmationOverlay()
                                         .setType(ConfirmationOverlay.SUCCESS_ANIMATION)

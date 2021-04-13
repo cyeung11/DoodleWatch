@@ -11,6 +11,7 @@
     <string name="create">New</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="rename">Rename</string>
     <string name="edit">Edit</string>
     <string name="exit_instruction">Save the doodle to exit</string>
 
