@@ -172,6 +172,7 @@ abstract class CommunicationAct : BaseAct(), DataClient.OnDataChangedListener,
             return@fromCallable (c.nodes?.firstOrNull { it.isNearby }?.id ?: c.nodes?.firstOrNull()?.id) ?: ""
         }.doOnError {
             it.printStackTrace()
+            listener?.onString(null)
         }.onErrorComplete()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

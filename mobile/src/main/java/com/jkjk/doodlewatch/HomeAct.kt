@@ -74,10 +74,14 @@ class HomeAct : CommunicationAct(), PermissionManager.PermissionListener {
         if (item.itemId == R.id.menuSync) {
             sendDrawingSyncInfo(this, object : StringListener {
                 override fun onString(value: String?) {
-                    if (value?.isNotBlank() == true) {
-                        Toast.makeText(this@HomeAct, R.string.syncing, Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this@HomeAct, R.string.sync_fail, Toast.LENGTH_SHORT).show()
+                    runOnUiThread {
+                        if (value?.isNotBlank() == true) {
+                            Toast.makeText(this@HomeAct, R.string.syncing, Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            Toast.makeText(this@HomeAct, R.string.sync_fail, Toast.LENGTH_SHORT)
+                                .show()
+                        }
                     }
                 }
             })
